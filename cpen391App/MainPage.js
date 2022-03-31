@@ -11,6 +11,7 @@ import {
 import {LineChart} from 'react-native-chart-kit';
 import {Dimensions} from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import Notifications from './Notifications';
 
 const config = {
   dependencies: {
@@ -68,12 +69,16 @@ const getData = async () => {
   setCO2(lastData.co2);
   setPeople(lastData.people);
   setLastUpdated(timePassed);
+
+  if(lastData.co2 > 1000){
+    Notifications.sendNotification();
+  }
 };
 
 useEffect(()=>{
 getData();
 setInterval(getData,60000); //polling every minute
-});
+},[]);
 
   return (
     <NativeBaseProvider config={config}>
