@@ -18,10 +18,10 @@ const config = {
   },
 };
 const roomName = 'LIFE 3302 Lab';
-const graphData = Array.from({length: 24}, () =>
-  Math.floor(Math.random() * (1500 - 400 + 1) + 400),
-);
-
+// const graphData = Array.from({length: 24}, () =>
+//   Math.floor(Math.random() * (1500 - 400 + 1) + 400),
+// );
+const graphData  = new Array(24).fill(0);
 const MainPage = () => {
 
 const [co2, setCO2] = useState([]);
@@ -29,17 +29,42 @@ const [people, setPeople] = useState([]);
 const [lastUpdated, setLastUpdated] = useState([]);
 
 const getData = async () => {
+
+  const emptyResponse = {
+    co2: "N/A",
+    people:"N/A",
+    time: Date.now()
+  }
+  const getAverage = (arr) => {
+    let sum=0;
+    for(let i=0;i<arr.length;i++){
+      sum += arr[i].co2;
+    }
+    return sum/arr.length;
+  }
+  
+  const getHalfHourAvg= (halfHour)=>{
+    const endHalfHoursAgo =  Date.now() -(60000*30*(halfHour+1));
+    const startHalfHoursAgo = Date.now() -(60000*30*halfHour);
+    const xHalfHourData = jsonResponse.filter( (e)=>{ //x hour of data
+      return  endHalfHoursAgo < e.time && e.time < startHalfHoursAgo;
+    });
+    return (xHalfHourData.length==0) ? 0 : getAverage(xHalfHourData);
+  }
+
+  const populateGraphData = ()=> {
+    for(let i=0; i<graphData.length;i++){
+      graphData[i] = getHalfHourAvg(i);
+    }
+    graphData.reverse();
+  }
+
   const response = await fetch("http://cpen391server-env.eba-pefitrhy.us-west-1.elasticbeanstalk.com/data/device1");
-  const jsonResponse = await response.json()
+  const jsonResponse = await response.json();
   await jsonResponse.sort((a, b) => (b.time) - (a.time)); //sorting in decending order
-  const lastData = jsonResponse[0];
-  const timePassed = Math.floor((Date.now() - lastData.time)/60000);
-  const twelveHoursAgo = Date.now() -(60000*60*12);
-  const graphData = jsonResponse.filter((e)=>{ //filter only the last 12 hours of data
-    return e.time > twelveHoursAgo;
-  });
-  //TODO: in the graphData you want to filter the data into half hour time fragments, calcuate the average for each one, and add as a point in the graph 
-  console.log(graphData); 
+  const lastData = jsonResponse[0] || emptyResponse;
+  const timePassed = Math.floor((Date.now() - lastData.time)/60000);  
+  populateGraphData(); 
   setCO2(lastData.co2);
   setPeople(lastData.people);
   setLastUpdated(timePassed);
@@ -47,6 +72,7 @@ const getData = async () => {
 
 useEffect(()=>{
 getData();
+setInterval(getData,60000); //polling every minute
 });
 
   return (
