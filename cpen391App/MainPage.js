@@ -23,6 +23,7 @@ const roomName = 'LIFE 3302 Lab';
 //   Math.floor(Math.random() * (1500 - 400 + 1) + 400),
 // );
 const graphData  = new Array(24).fill(0);
+let over1000 = false;
 const MainPage = () => {
 
 const [co2, setCO2] = useState([]);
@@ -70,8 +71,11 @@ const getData = async () => {
   setPeople(lastData.people);
   setLastUpdated(timePassed);
 
-  if(lastData.co2 > 1000){
+  if(lastData.co2 > 1000 && !over1000){
     Notifications.sendNotification();
+    over1000= true;
+  } else{
+    over1000=false;
   }
 };
 
