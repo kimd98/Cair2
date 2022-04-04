@@ -18,14 +18,15 @@ const config = {
     'linear-gradient': require('react-native-linear-gradient').default,
   },
 };
-const roomName = 'LIFE 3302 Lab';
 // const graphData = Array.from({length: 24}, () =>
 //   Math.floor(Math.random() * (1500 - 400 + 1) + 400),
 // );
 const graphData  = new Array(24).fill(0);
 let over1000 = false;
-const MainPage = () => {
 
+const MainPage = ({route, navigation}) => {
+
+const {deviceId} = route.params; //TODO:this is used to choose the correct endpoint
 const [co2, setCO2] = useState([]);
 const [people, setPeople] = useState([]);
 const [lastUpdated, setLastUpdated] = useState([]);
@@ -82,6 +83,11 @@ const getData = async () => {
 useEffect(()=>{
 getData();
 setInterval(getData,60000); //polling every minute
+return () => {
+  setCO2({}); 
+  setPeople({});
+  setLastUpdated({});
+};
 },[]);
 
   return (
@@ -96,17 +102,17 @@ setInterval(getData,60000); //polling every minute
           },
         }}
         alignItems="center">
-        <>
+        {/* <>
           <StatusBar barStyle="dark-content" />
           <Box safeAreaTop shadow="7" w="100%" bg="white" alignItems="center">
             <HStack py="3" justifyContent="space-between" w="80%">
               <Heading isTruncated size="xl">
-                {roomName}
+                {deviceName}
               </Heading>
               <Icon name="edit" size={30} color="black" />
             </HStack>
           </Box>
-        </>
+        </> */}
         <Text width="80%" pb="1" pt="4" fontSize="md">
           CO2 Level
         </Text>
