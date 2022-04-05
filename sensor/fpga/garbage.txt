@@ -1,1 +1,0 @@
-please add the quartus project files for the sensor and fan control
