@@ -6,11 +6,9 @@ import {
   Text,
   HStack,
   VStack,
-  StatusBar,
 } from 'native-base';
 import {LineChart} from 'react-native-chart-kit';
 import {Dimensions} from 'react-native';
-import Icon from 'react-native-vector-icons/Feather';
 import Notifications from './Notifications';
 
 const config = {
@@ -18,26 +16,20 @@ const config = {
     'linear-gradient': require('react-native-linear-gradient').default,
   },
 };
-// const graphData = Array.from({length: 24}, () =>
-//   Math.floor(Math.random() * (1500 - 400 + 1) + 400),
-// );
+
 const graphData  = new Array(24).fill(0);
 let over1000 = false;
 
 const MainPage = ({route, navigation}) => {
 
-const {deviceId} = route.params; //TODO:this is used to choose the correct endpoint
+const {deviceId} = route.params; 
+
 const [co2, setCO2] = useState([]);
 const [people, setPeople] = useState([]);
 const [lastUpdated, setLastUpdated] = useState([]);
 
-const getData = async () => {
+const getGraphData = async () => {
 
-  const emptyResponse = {
-    co2: "N/A",
-    people:"N/A",
-    time: Date.now()
-  }
   const getAverage = (arr) => {
     let sum=0;
     for(let i=0;i<arr.length;i++){
@@ -62,12 +54,24 @@ const getData = async () => {
     graphData.reverse();
   }
 
-  const response = await fetch("http://cpen391server-env.eba-pefitrhy.us-west-1.elasticbeanstalk.com/data/device1");
+  const response = await fetch(`http://cpen391server-env.eba-pefitrhy.us-west-1.elasticbeanstalk.com/data/device${deviceId}`);
   const jsonResponse = await response.json();
   await jsonResponse.sort((a, b) => (b.time) - (a.time)); //sorting in decending order
-  const lastData = jsonResponse[0] || emptyResponse;
-  const timePassed = Math.floor((Date.now() - lastData.time)/60000);  
   populateGraphData(); 
+};
+
+const getCurrentData =async ()=>{
+
+  const emptyResponse = {
+    co2: "N/A",
+    people:"N/A",
+    time: Date.now()
+  }
+
+  const response = await fetch(`http://cpen391server-env.eba-pefitrhy.us-west-1.elasticbeanstalk.com/data/device${deviceId}/new`);
+  const jsonResponse = await response.json();
+  const lastData = jsonResponse || emptyResponse;
+  const timePassed = Math.floor((Date.now() - lastData.time)/60000);  
   setCO2(lastData.co2);
   setPeople(lastData.people);
   setLastUpdated(timePassed);
@@ -78,11 +82,13 @@ const getData = async () => {
   } else{
     over1000=false;
   }
-};
+}
 
 useEffect(()=>{
-getData();
-setInterval(getData,60000); //polling every minute
+getCurrentData();
+getGraphData();
+setInterval(getGraphData,10000); //polling every 10 seconds
+setInterval(getGraphData,60000); //polling every minute
 return () => {
   setCO2({}); 
   setPeople({});
@@ -102,17 +108,6 @@ return () => {
           },
         }}
         alignItems="center">
-        {/* <>
-          <StatusBar barStyle="dark-content" />
-          <Box safeAreaTop shadow="7" w="100%" bg="white" alignItems="center">
-            <HStack py="3" justifyContent="space-between" w="80%">
-              <Heading isTruncated size="xl">
-                {deviceName}
-              </Heading>
-              <Icon name="edit" size={30} color="black" />
-            </HStack>
-          </Box>
-        </> */}
         <Text width="80%" pb="1" pt="4" fontSize="md">
           CO2 Level
         </Text>
