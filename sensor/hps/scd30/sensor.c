@@ -14,12 +14,6 @@ void write_file(float co2_ppm);
 int read_co2();
 int read_people();
 void post_data(int co2, int num_people);
-// int open_physical (int);
-// void * map_physical (int, unsigned int, unsigned int);
-// void close_physical (int);
-// int unmap_physical (void *, unsigned int);
-// void bin (unsigned n);
-
 void change_speed(int speed);
 
 int main(void) {
@@ -28,10 +22,21 @@ int main(void) {
     uint16_t interval_in_seconds = 2;
     int post_time_counter = 0;
 
+    // sensor probing
     sensirion_i2c_init();
     while (scd30_probe() != NO_ERROR) {
         printf("SCD30 sensor probing failed\n");
         sensirion_sleep_usec(1000000u);
+    }
+
+    // automatic self calibration
+    int16_t calibration_enabled = scd30_enable_automatic_self_calibration(1);
+    if (calibration_enabled == 0) {
+        printf("Automatic calibration enabled successfully!\n");
+        printf("If activated for the first time, a period  of minimum 7 days is needed. 
+        Please make sure that the sensor has been exposed to fresh air for at least 1 hour everyday.\n");
+    } else {
+        printf("Error while enabling ASC...\n");
     }
 
     scd30_set_measurement_interval(interval_in_seconds);
@@ -42,10 +47,7 @@ int main(void) {
         uint16_t data_ready = 0;
         uint16_t timeout = 0;
 
-        /* Poll data_ready flag until data is available. Allow 20% more than
-         * the measurement interval to account for clock imprecision of the
-         * sensor.
-         */
+        // allows 20% more than the measurement interval to account for clock imprecision
         for (timeout = 0; (100000 * timeout) < (interval_in_seconds * 1200000);
              ++timeout) {
             err = scd30_get_data_ready(&data_ready);
@@ -62,9 +64,7 @@ int main(void) {
             continue;
         }
 
-        /* Measure co2, temperature and relative humidity and store into
-         * variables.
-         */
+        // measure CO2
         err =
             scd30_read_measurement(&co2_ppm, &temperature, &relative_humidity);
         printf("CO2 measured.\n");
@@ -76,15 +76,13 @@ int main(void) {
             printf("CO2 data written to \"co2_ppm.txt\"");
         }
 
+        // read CO2 and send outputs to cloud
         int co2 = read_co2();
         change_speed(co2 / 50);
         printf("CO2 = %d\n", co2);
         post_data(co2, read_people());
-
         sleep(POST_INTERVAL);
-
     }
-
     scd30_stop_periodic_measurement();
     return 0;
 }
@@ -107,27 +105,20 @@ int read_co2() {
     char buffer[30];
 
     data = fopen("co2_ppm.txt", "r");
-
     if (NULL == data)
     {
          perror("opening database");
          return (-1);
     }
 
-    while (EOF != fscanf(data, "%[^\n]\n", buffer))
-    {
-        //  printf("> %s\n", buffer);
-        continue;
-    }
-
-    // int result = atoi(buffer);
-
+    while (EOF != fscanf(data, "%[^\n]\n", buffer));
     fclose(data);
     int result = atoi(buffer);
 
     return result;
 }
 
+// send the data to the cloud server
 void post_data(int co2, int num_people) {
     CURL *curl;
     CURLcode response;
@@ -169,63 +160,7 @@ int read_people() {
     return rand() % 50;
 }
 
-// // Open /dev/mem, if not already done, to give access to physical addresses
-// int open_physical (int fd)
-// {
-//    if (fd == -1)
-//       if ((fd = open( "/dev/mem", (O_RDWR | O_SYNC))) == -1)
-//       {
-//          printf ("ERROR: could not open \"/dev/mem\"...\n");
-//          return (-1);
-//       }
-//    return fd;
-// }
-
-// // Close /dev/mem to give access to physical addresses
-// void close_physical (int fd)
-// {
-//    close (fd);
-// }
-
-// /*
-//  * Establish a virtual address mapping for the physical addresses starting at base, and
-//  * extending by span bytes.
-//  */
-// void* map_physical(int fd, unsigned int base, unsigned int span)
-// {
-//    void *virtual_base;
-
-//    // Get a mapping from physical addresses to virtual addresses
-//    virtual_base = mmap (NULL, span, (PROT_READ | PROT_WRITE), MAP_SHARED, fd, base);
-//    if (virtual_base == MAP_FAILED)
-//    {
-//       printf ("ERROR: mmap() failed...\n");
-//       close (fd);
-//       return (NULL);
-//    }
-//    return virtual_base;
-// }
-
-// /*
-//  * Close the previously-opened virtual address mapping
-//  */
-// int unmap_physical(void * virtual_base, unsigned int span)
-// {
-//    if (munmap (virtual_base, span) != 0)
-//    {
-//       printf ("ERROR: munmap() failed...\n");
-//       return (-1);
-//    }
-//    return 0;
-// }
-
-// // Print a binary number
-// void bin(unsigned n){
-//     unsigned i;
-//     for (i = 1 << 31; i > 0; i = i / 2)
-//         (n & i) ? printf("1") : printf("0");
-// }
-
+// fan control based on the CO2 mesaurements in ppm
 void change_speed(int speed) {
     volatile unsigned int * GPIO_ptr;
     int fd = -1; // used to open /dev/mem

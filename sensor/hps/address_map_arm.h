@@ -18,7 +18,7 @@
 #define HEX5_HEX4_BASE         0x00000030
 #define SW_BASE                0x00000040
 #define KEY_BASE               0x00000050
-#define JP1_BASE               0x00000060
+#define JP1_BASE               0x00000000   // The original file is 0x60
 #define JP2_BASE               0x00000070
 #define PS2_BASE               0x00000100
 #define PS2_DUAL_BASE          0x00000108
@@ -115,3 +115,4 @@
     0 : I2C0 uses HPS Pins.
     1 : I2C0 uses the FPGA Inteface. */
 #define SYSMGR_SPAN            0x00000800      // base
+
