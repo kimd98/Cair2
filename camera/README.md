@@ -30,6 +30,9 @@
 
 ## HPS
 
+**SD card image**
+- [DE1-SoC-UP-Linux](https://drive.google.com/file/d/1wNibVu8XvRHaSwZvW3v60HjYfnx3h9Kv/view?usp=sharing)
+
 **Script file supporting quartus project**
 - cpen391_computer.rbf
 
