@@ -6,6 +6,7 @@ import {
   Text,
   HStack,
   VStack,
+  ScrollView
 } from 'native-base';
 import {LineChart} from 'react-native-chart-kit';
 import {Dimensions} from 'react-native';
@@ -17,7 +18,7 @@ const config = {
   },
 };
 
-const graphData  = new Array(24).fill(0);
+
 let over1000 = false;
 
 const MainPage = ({route, navigation}) => {
@@ -27,7 +28,8 @@ const {deviceId} = route.params;
 const [co2, setCO2] = useState([]);
 const [people, setPeople] = useState([]);
 const [lastUpdated, setLastUpdated] = useState([]);
-
+const [graphData, setgraphData] = useState(new Array(24).fill(0));
+// const graphData  = new Array(24).fill(0);
 const getGraphData = async () => {
 
   const getAverage = (arr) => {
@@ -87,17 +89,25 @@ const getCurrentData =async ()=>{
 useEffect(()=>{
 getCurrentData();
 getGraphData();
-setInterval(getGraphData,10000); //polling every 10 seconds
+setInterval(getCurrentData,10000); //polling every 10 seconds
 setInterval(getGraphData,60000); //polling every minute
 return () => {
   setCO2({}); 
   setPeople({});
   setLastUpdated({});
+  setgraphData({});
 };
 },[]);
 
   return (
     <NativeBaseProvider config={config}>
+    <ScrollView
+            maxW="100%"
+            h="100"
+            _contentContainerStyle={{
+              minW: '100%',
+              minH: '100',
+            }}>
       <Box
         flex={1}
         bg={{
@@ -107,7 +117,7 @@ return () => {
             end: [0, 1],
           },
         }}
-        alignItems="center">
+        alignItems="center">  
         <Text width="80%" pb="1" pt="4" fontSize="md">
           CO2 Level
         </Text>
@@ -185,6 +195,7 @@ return () => {
           />
         </Box>
       </Box>
+      </ScrollView>
     </NativeBaseProvider>
   );
 };

@@ -57,7 +57,7 @@ const LoginPage = ({navigation}) => {
         <Text width="80%" color="cyan.900" textAlign="center" pb="3" fontSize="md">
           scan QR code on the device to login
         </Text>
-        <Button  variant="subtle" leftIcon={<Icon name="qrcode-scan" size={30} color="#06b6d4" />}>
+        <Button  variant="subtle"  onPress={() => navigation.navigate('QR code scanning')} leftIcon={<Icon name="qrcode-scan" size={30} color="#06b6d4" />}>
       Add new device
       </Button>
         <Text width="80%" color="cyan.900" textAlign="center" pb="3" pt="4" fontSize="lg">
