@@ -5,9 +5,12 @@
 -  **hps/**: software related files with embedded driver modules for Sensirion's SCD product line
 
 ## FPGA
-SCD30: SCL-GPIO0[2] & SDA-GPIO[3]
-NF-F12: PWM-GPIO0[12] & TACH-GPIO0[12]
-5V power supply-GPIO0[10] & ground-GPIO[11]
+**Pin connection**
+  - SCD30: SCL-GPIO0[2] & SDA-GPIO[3]
+  - NF-F12: PWM-GPIO0[12] & TACH-GPIO0[12]
+  - 5V power supply-GPIO0[10] & Ground-GPIO0[11]
+
+**Quartus project files**
 
 ## HPS
 
@@ -18,5 +21,4 @@ NF-F12: PWM-GPIO0[12] & TACH-GPIO0[12]
 
 **SCD30 driver**
 - embedded-scd/embedded-common/: I2C bit-banging (software) configuration
-- embedded-scd/scd30: codes to read CO2 measurements and send data to the cloud server
-```./scd30_example_usage```
+- embedded-scd/scd30: read CO2 measurements and send data to the cloud server using the command ```./scd30_example_usage```
