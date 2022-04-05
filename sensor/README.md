@@ -20,5 +20,5 @@
 - MSEL for booting: 010100
 
 **SCD30 driver**
-- embedded-scd/embedded-common/: I2C bit-banging (software) configuration
-- embedded-scd/scd30: read CO2 measurements and send data to the cloud server using the command ```./scd30_example_usage```
+- embedded-common/: I2C bit-banging (software) configuration using GPIO pins
+- scd30/: read CO2 measurements and send data to the cloud server using the command ```./sensor``` (create an executable file using ```make all```)

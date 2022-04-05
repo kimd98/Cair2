@@ -33,8 +33,7 @@ int main(void) {
     int16_t calibration_enabled = scd30_enable_automatic_self_calibration(1);
     if (calibration_enabled == 0) {
         printf("Automatic calibration enabled successfully!\n");
-        printf("If activated for the first time, a period  of minimum 7 days is needed. 
-        Please make sure that the sensor has been exposed to fresh air for at least 1 hour everyday.\n");
+        printf("If activated for the first time, a period  of minimum 7 days is needed. Please make sure that the sensor has been exposed to fresh air for at least 1 hour everyday.\n");
     } else {
         printf("Error while enabling ASC...\n");
     }
