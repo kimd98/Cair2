@@ -11,6 +11,7 @@ import {
 import {LineChart} from 'react-native-chart-kit';
 import {Dimensions} from 'react-native';
 import Notifications from './Notifications';
+import ScrollContentViewNativeComponent from 'react-native/Libraries/Components/ScrollView/ScrollContentViewNativeComponent';
 
 const config = {
   dependencies: {
@@ -29,6 +30,40 @@ const [co2, setCO2] = useState([]);
 const [people, setPeople] = useState([]);
 const [lastUpdated, setLastUpdated] = useState([]);
 const [graphData, setgraphData] = useState(new Array(24).fill(0));
+const [graphView, setGraphView] = useState(<LineChart
+  data={{
+    labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+    datasets: [
+      {
+        data: graphData,
+      },
+    ],
+  }}
+  width={Dimensions.get('window').width * 0.8} // from react-native
+  height={Dimensions.get('window').height * 0.35}
+  yAxisInterval={1} // optional, defaults to 1
+  chartConfig={{
+    backgroundColor: 'black',
+    backgroundGradientFrom: 'white',
+    backgroundGradientTo: 'white',
+    decimalPlaces: 0, // optional, defaults to 2dp
+    color: (opacity = 1) => `rgba(7, 94, 169, ${opacity})`,
+    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    style: {
+      borderRadius: 16,
+    },
+    propsForDots: {
+      r: '6',
+      strokeWidth: '2',
+      stroke: '#CEDED8',
+    },
+  }}
+  bezier
+  style={{
+    marginVertical: 8,
+    borderRadius: 16,
+  }}
+/>);
 // const graphData  = new Array(24).fill(0);
 const getGraphData = async () => {
 
@@ -54,12 +89,48 @@ const getGraphData = async () => {
       graphData[i] = getHalfHourAvg(i);
     }
     graphData.reverse();
+    setgraphData(graphData);
   }
 
   const response = await fetch(`http://cpen391server-env.eba-pefitrhy.us-west-1.elasticbeanstalk.com/data/device${deviceId}`);
   const jsonResponse = await response.json();
   await jsonResponse.sort((a, b) => (b.time) - (a.time)); //sorting in decending order
-  populateGraphData(); 
+  populateGraphData();
+  const graphViewRender = <LineChart
+  data={{
+    labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+    datasets: [
+      {
+        data: graphData,
+      },
+    ],
+  }}
+  width={Dimensions.get('window').width * 0.8} // from react-native
+  height={Dimensions.get('window').height * 0.35}
+  yAxisInterval={1} // optional, defaults to 1
+  chartConfig={{
+    backgroundColor: 'black',
+    backgroundGradientFrom: 'white',
+    backgroundGradientTo: 'white',
+    decimalPlaces: 0, // optional, defaults to 2dp
+    color: (opacity = 1) => `rgba(7, 94, 169, ${opacity})`,
+    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    style: {
+      borderRadius: 16,
+    },
+    propsForDots: {
+      r: '6',
+      strokeWidth: '2',
+      stroke: '#CEDED8',
+    },
+  }}
+  bezier
+  style={{
+    marginVertical: 8,
+    borderRadius: 16,
+  }}
+/>
+setGraphView(graphViewRender);
 };
 
 const getCurrentData =async ()=>{
@@ -159,40 +230,7 @@ return () => {
           CO2 level history
         </Text>
         <Box>
-          <LineChart
-            data={{
-              labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-              datasets: [
-                {
-                  data: graphData,
-                },
-              ],
-            }}
-            width={Dimensions.get('window').width * 0.8} // from react-native
-            height={Dimensions.get('window').height * 0.35}
-            yAxisInterval={1} // optional, defaults to 1
-            chartConfig={{
-              backgroundColor: 'black',
-              backgroundGradientFrom: 'white',
-              backgroundGradientTo: 'white',
-              decimalPlaces: 0, // optional, defaults to 2dp
-              color: (opacity = 1) => `rgba(7, 94, 169, ${opacity})`,
-              labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-              style: {
-                borderRadius: 16,
-              },
-              propsForDots: {
-                r: '6',
-                strokeWidth: '2',
-                stroke: '#CEDED8',
-              },
-            }}
-            bezier
-            style={{
-              marginVertical: 8,
-              borderRadius: 16,
-            }}
-          />
+        {graphView}
         </Box>
       </Box>
       </ScrollView>

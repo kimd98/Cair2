@@ -26,6 +26,7 @@ const ExistingDevicesPage = ({navigation}) => {
   const [buttons, setButtons] = useState([]);
 
   useEffect(()=>{
+  
   renderButtons();
   return () => {
     setButtons(<></>);
@@ -33,7 +34,7 @@ const ExistingDevicesPage = ({navigation}) => {
   },[]);
 
   const renderButtons = async () => {
-  // await storeNewDevice({name:"LAB 3301",deviceId:1});
+  //await storeNewDevice({name:"LAB 3301",deviceId:1});
   savedDevices = await getSavedDevices();
     console.log(savedDevices);
 
