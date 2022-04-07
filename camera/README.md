@@ -37,3 +37,13 @@
 - cpen391_computer.rbf
 
 ## Algorithms
+
+**Python file**
+- yolo.py
+
+**Machine learning model**
+- yolov3
+- coco.names
+- yolov3.weights
+
+Source: using machine model from https://pjreddie.com/darknet/yolo/
