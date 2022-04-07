@@ -1,3 +1,0 @@
-# Cloud development
-
-for Victor
