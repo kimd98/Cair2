@@ -2,13 +2,19 @@ import { RNCamera } from 'react-native-camera'
 import React, { useCallback, useState } from 'react';
 import {getSavedDevices,storeNewDevice, removeValue} from './LocalStorage'
 import {
+    Dimensions,
     StyleSheet,
-    Animated,
+    // Animated,
     View,
     Text,
     Button
 } from 'react-native';
  
+
+const win = Dimensions.get("window");
+const screen_height = win.height;
+const screen_width = win.width;
+
 
 export default function ScanQRCode({navigation}) {
     const [flash, setFlash] = useState(false)
@@ -16,11 +22,10 @@ export default function ScanQRCode({navigation}) {
     const onBarCodeRead = useCallback(async(result) => {
         if(!hasScanned){
             hasScanned=true;
-        const { data } = result;
-        const deviceJson = JSON.parse(data);
-        //await removeValue();
-        await storeNewDevice(deviceJson);
-        navigation.navigate('Existing Devices');
+            const { data } = result;
+            const deviceJson = JSON.parse(data);
+            await storeNewDevice(deviceJson);
+            navigation.navigate('Existing Devices');
         }
     }, [])
 
@@ -30,28 +35,22 @@ export default function ScanQRCode({navigation}) {
             <RNCamera
                 captureAudio={false}
                 autoFocus={RNCamera.Constants.AutoFocus.on}
-                style={[styles.preview]}
                 type={RNCamera.Constants.Type.back}
                 flashMode={flash ? RNCamera.Constants.FlashMode.torch : RNCamera.Constants.FlashMode.off}
                 onBarCodeRead={onBarCodeRead}
             >
-                <View style={{
-                    width: 500,
-                    height: '20%',
-                    backgroundColor: 'rgba(0,0,0,0.5)',
-                }} />
- 
-                <View style={[{ flexDirection: 'row' }]}>
-                    <View style={{ backgroundColor: 'rgba(0,0,0,0.5)', height: 300, width: 300 }} />
-                    <View style={{ width: 300, height: 300 }}>
-                    {/*  */}
-                    </View>
-                    <View style={{ backgroundColor: 'rgba(0,0,0,0.5)', height: 300, width: 300 }} />
+                <View style={styles.topview} >
+                    <Text style={styles.text}>Recognizing QR Code ...</Text>
                 </View>
  
-                <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)', width: 500, alignItems: 'center' }}>
-                    <Text style={styles.rectangleText}>Recognizing QR Code ...</Text>
-                    <View style={{ backgroundColor: 'rgba(0,0,0,0)', height: 30, width: 500 }} />
+                <View style={styles.middleview}>
+                    <View style={styles.leftrightspace} />
+                    <View style={{ width: '75%'}} />
+                    <View style={styles.leftrightspace} />
+                </View>
+ 
+                <View style={styles.bottomview}>
+                    <View style={styles.buttonspace} />
                     <Button onPress={() => {
                         setFlash(!flash)
                     }} color="#F5A83D" title={(flash ? 'Turn off ' : 'Turn on ') + 'flashlight'} />
@@ -64,38 +63,41 @@ export default function ScanQRCode({navigation}) {
   
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        flexDirection: 'row'
+        width: screen_width,
+        height: screen_height,
+        flex: 1
     },
-    preview: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+    topview:{
+        width: screen_width, 
+        height: (screen_height-3*screen_width/4)/2, 
+        backgroundColor: 'rgba(0,0,0,0.5)'
     },
-    rectangleContainer: {
-        flex: 1,
-        justifyContent: 'flex-end',
+    middleview:{
+        flexDirection: 'row', 
+        width: screen_width, 
+        height: 3*screen_width/4
+    },
+    bottomview:{
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        width: '100%', 
+        height: (screen_height-3*screen_width/4)/2,
         alignItems: 'center'
     },
-    rectangle: {
-        height: '20%',
-        width: 200,
-        borderWidth: 1,
-        borderColor: '#7687AD',
-        backgroundColor: 'transparent',
-        borderRadius: 10,
+    buttonspace:{
+        backgroundColor: 'rgba(0, 0, 0, 0)',
+        width: screen_width,
+        height: screen_height*0.08
     },
-    rectangleText: {
-        flex: 0,
-        color: '#fff',
-        marginTop: 10,
-        fontSize: 25
+    leftrightspace:{
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        width: '12.5%',
+        height: 3*screen_width/4
     },
-    border: {
+    text: {
         flex: 0,
-        width: 196,
-        height: 2,
-        backgroundColor: '#7687AD',
-        borderRadius: 50
+        color: '#FFFFFF',
+        marginTop: 3*(screen_height-3*screen_width/4)/8 ,
+        fontSize: 25,
+        textAlign: 'center'
     }
 });
