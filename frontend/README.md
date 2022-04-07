@@ -1,2 +1,0 @@
-# Mobile application
-for emily
