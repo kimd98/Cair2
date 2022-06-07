@@ -12,3 +12,5 @@ Cair2 is a CO2 level monitor device that allows the users to view the CO2 concen
 - Real time object detection: people detection/counting using YOLO
 - Cloud: MongoDB Atlas, AWS server using Node.js
 - Mobile app: Android, React Native, QR code scanning
+
+Demo video: https://drive.google.com/file/d/1qihtJvEefW5wiKdMSny09G_yMh31Tkzm/view?usp=sharing
